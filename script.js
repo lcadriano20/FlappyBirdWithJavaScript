@@ -18,17 +18,17 @@ img.style.display = 'none'
 
 message.classList.add('messageStyle')
 
-document.addEventListener('keydown',(e)=> {
+document.addEventListener('keydown', (e)=> {
     if(e.key == 'Enter' && game_state != 'Play') {
          PrepareToInitiate()   
     }
 })
 function PrepareToInitiate() {
-    document.querySelectorAll('pipe_sprite').forEach((e)=>{
+    document.querySelectorAll('.pipe_sprite').forEach((e)=>{
         e.remove()
     })
     img.style.display = 'block';
-    bird.style.top ='40vh'
+    
     game_state = 'Play';
     message.innerHTML = '';
     score_title.innerHTML = 'Score : '
@@ -36,9 +36,18 @@ function PrepareToInitiate() {
     message.classList.remove('messageStyle')
     startPlaying()
 }
+function uLostTheGame() {
+    game_state = 'End'
+    message.innerHTML = 'Game Over'.fontcolor('red') + '<br> Press Enter to Restart';
+    message.classList.add('messageStyle')
+    img.style.display = 'none';
+}
+
+
 function startPlaying() {
     function move() {
         if(game_state != 'Play') return
+        
         let pipe_sprite = document.querySelectorAll('.pipe_sprite')
         pipe_sprite.forEach((element)=> {
            let pipe_sprite_props = element.getBoundingClientRect()
@@ -47,16 +56,13 @@ function startPlaying() {
            if(pipe_sprite_props.right<=0) {
             element.remove()
            } else {
-            if(bird_props.left < pipe_sprite_props.left + pipe_sprite_props.width && bird_props.left + bird_props.width > pipe_sprite_props.left && bird_props.top < pipe_sprite_props.top + pipe_sprite_props.height && bird_props.top + bird_props.height > pipe_sprite_props.top) {
+            if(bird_props.left < pipe_sprite_props.left + pipe_sprite_props.width && bird_props.left + bird_props.width > pipe_sprite_props.left && bird_props.top < pipe_sprite_props.top + pipe_sprite_props.height && bird_props.top + bird_props.height > pipe_sprite_props.top)  {
                 // U lost the game :(
-                game_state = 'End'
-                message.innerHTML = 'Game Over'.fontcolor('red') + '<br> Press Enter to Restart';
-                message.classList.add('messageStyle')
-                img.style.display = 'none';
-                return
+                uLostTheGame()
+                return;
             } else {
                 if(pipe_sprite_props.right < bird_props.left && pipe_sprite_props.right + move_speed >= bird_props.left && element.increase_score == '1') {
-                    score_val.innerHTML += score_val.innerHTML +1;
+                    score_val.innerHTML =+ score_val.innerHTML +1;
                 }
                 element.style.left = pipe_sprite_props.left - move_speed + 'px';
             }
@@ -102,9 +108,8 @@ function startPlaying() {
     let pipe_gap = 35; 
 
     function createPipe() {
-        if(game_state != 'Play' ){
-                return; 
-        }
+        if(game_state != 'Play') return
+        
         if(pipe_separation > 115) {
             pipe_separation = 0; 
             let pipe_posi = Math.floor(Math.random()* 43) + 8;
